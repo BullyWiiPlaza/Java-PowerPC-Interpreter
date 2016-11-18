@@ -1,12 +1,12 @@
 package com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.implementations;
 
-import com.bullywiihacks.powerpc.assembly.interpreter.library.PPCAssemblyInterpreter;
+import com.bullywiihacks.powerpc.assembly.interpreter.library.AssemblyInterpreter;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.AssemblyInstruction;
 
 public class NoOperation extends AssemblyInstruction
 {
 	@Override
-	public void execute(PPCAssemblyInterpreter interpreter)
+	public void execute(AssemblyInterpreter interpreter)
 	{
 
 	}

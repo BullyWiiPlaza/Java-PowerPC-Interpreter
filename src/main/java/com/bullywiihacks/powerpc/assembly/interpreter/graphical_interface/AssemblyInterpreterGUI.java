@@ -1,7 +1,7 @@
 package com.bullywiihacks.powerpc.assembly.interpreter.graphical_interface;
 
-import com.bullywiihacks.powerpc.assembly.interpreter.library.PPCAssemblyInterpreter;
-import com.bullywiihacks.powerpc.assembly.interpreter.library.PPCAssemblyParser;
+import com.bullywiihacks.powerpc.assembly.interpreter.library.AssemblyInterpreter;
+import com.bullywiihacks.powerpc.assembly.interpreter.library.AssemblyParser;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.AssemblyInstruction;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
@@ -10,11 +10,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 
 public class AssemblyInterpreterGUI extends JFrame
@@ -32,9 +28,9 @@ public class AssemblyInterpreterGUI extends JFrame
 	private MemoryTable memoryTable;
 	private JButton resetButton;
 	private JButton assemblyDocumentationButton;
-	private PPCAssemblyParser parser;
+	private AssemblyParser parser;
 	private boolean canInterpret;
-	private PPCAssemblyInterpreter interpreter;
+	private AssemblyInterpreter interpreter;
 
 	public AssemblyInterpreterGUI()
 	{
@@ -135,7 +131,7 @@ public class AssemblyInterpreterGUI extends JFrame
 
 	private void initializeTables()
 	{
-		interpreter = new PPCAssemblyInterpreter();
+		interpreter = new AssemblyInterpreter();
 		registersTable.removeAllRows();
 		memoryTable.removeAllRows();
 		registersTable.addRows(interpreter.getGeneralPurposeRegisters());
@@ -150,7 +146,7 @@ public class AssemblyInterpreterGUI extends JFrame
 
 			try
 			{
-				parser = new PPCAssemblyParser();
+				parser = new AssemblyParser();
 				String inputtedAssembly = assemblyArea.getText();
 				parser.parseAssembly(inputtedAssembly);
 				canInterpret = true;

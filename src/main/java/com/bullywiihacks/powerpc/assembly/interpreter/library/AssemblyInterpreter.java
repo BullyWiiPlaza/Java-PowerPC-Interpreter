@@ -8,7 +8,7 @@ import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.argum
 import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.implementations.Add;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.implementations.LoadImmediate;
 
-public class PPCAssemblyInterpreter
+public class AssemblyInterpreter
 {
 	private GeneralPurposeRegister[] generalPurposeRegisters;
 	private FloatingPointRegister[] floatingPointRegisters;
@@ -16,7 +16,7 @@ public class PPCAssemblyInterpreter
 
 	public static final int REGISTERS_COUNT = 32;
 
-	public PPCAssemblyInterpreter()
+	public AssemblyInterpreter()
 	{
 		generalPurposeRegisters = new GeneralPurposeRegister[REGISTERS_COUNT];
 		floatingPointRegisters = new FloatingPointRegister[REGISTERS_COUNT];
@@ -84,7 +84,7 @@ public class PPCAssemblyInterpreter
 
 	private static void interpreterTesting()
 	{
-		PPCAssemblyInterpreter assemblyInterpreter = new PPCAssemblyInterpreter();
+		AssemblyInterpreter assemblyInterpreter = new AssemblyInterpreter();
 		LoadImmediate loadImmediate = new LoadImmediate(
 				new ArgumentRegister(31), new Immediate(32767));
 

@@ -1,5 +1,5 @@
-import com.bullywiihacks.powerpc.assembly.interpreter.library.PPCAssemblyInterpreter;
-import com.bullywiihacks.powerpc.assembly.interpreter.library.PPCAssemblyParser;
+import com.bullywiihacks.powerpc.assembly.interpreter.library.AssemblyInterpreter;
+import com.bullywiihacks.powerpc.assembly.interpreter.library.AssemblyParser;
 import com.bullywiihacks.powerpc.assembly.interpreter.graphical_interface.AssemblyInterpreterGUI;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.AssemblyInstruction;
 
@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.io.File;
 import java.util.List;
 
-public class Testing
+public class PowerPCAssemblyInterpreterGUIClient
 {
 	public static void main(String[] arguments) throws Exception
 	{
@@ -22,8 +22,8 @@ public class Testing
 
 	private static void parserTesting() throws Exception
 	{
-		PPCAssemblyInterpreter assemblyInterpreter = new PPCAssemblyInterpreter();
-		PPCAssemblyParser parser = new PPCAssemblyParser();
+		AssemblyInterpreter assemblyInterpreter = new AssemblyInterpreter();
+		AssemblyParser parser = new AssemblyParser();
 		List<AssemblyInstruction> assemblyInstructions = parser.parseAssembly(new File("assembly.txt"));
 		for (AssemblyInstruction assemblyInstruction : assemblyInstructions)
 		{

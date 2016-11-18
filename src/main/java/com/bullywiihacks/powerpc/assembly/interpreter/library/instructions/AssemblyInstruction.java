@@ -1,6 +1,6 @@
 package com.bullywiihacks.powerpc.assembly.interpreter.library.instructions;
 
-import com.bullywiihacks.powerpc.assembly.interpreter.library.PPCAssemblyInterpreter;
+import com.bullywiihacks.powerpc.assembly.interpreter.library.AssemblyInterpreter;
 
 /*
  * add, addi, addis, sub, subi, subis, and, andi., andis., b, cmpw, cpmwi, lbz, lbzx, lhz, lhzx, lwz, lwzx, mulli, mullw, or, ori, oris, stb, stbx, sth, sthx, stw, stwx, xor, xori, xoris
@@ -8,7 +8,7 @@ import com.bullywiihacks.powerpc.assembly.interpreter.library.PPCAssemblyInterpr
 
 public abstract class AssemblyInstruction
 {
-	public abstract void execute(PPCAssemblyInterpreter interpreter);
+	public abstract void execute(AssemblyInterpreter interpreter);
 
 	public abstract String toString();
 

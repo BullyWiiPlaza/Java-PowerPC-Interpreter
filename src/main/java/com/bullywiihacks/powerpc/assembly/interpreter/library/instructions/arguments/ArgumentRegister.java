@@ -1,11 +1,11 @@
 package com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.arguments;
 
-import com.bullywiihacks.powerpc.assembly.interpreter.library.PPCAssemblyInterpreter;
+import com.bullywiihacks.powerpc.assembly.interpreter.library.AssemblyInterpreter;
 
 public class ArgumentRegister
 {
 	private static int registersMinIndex = 0;
-	private static int registersMaxIndex = PPCAssemblyInterpreter.REGISTERS_COUNT - 1;
+	private static int registersMaxIndex = AssemblyInterpreter.REGISTERS_COUNT - 1;
 
 	private int registerIndex;
 

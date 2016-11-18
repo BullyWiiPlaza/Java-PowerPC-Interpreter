@@ -9,11 +9,11 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PPCAssemblyParser
+public class AssemblyParser
 {
 	private List<AssemblyInstruction> existingAssemblyInstructions;
 
-	public PPCAssemblyParser()
+	public AssemblyParser()
 	{
 		existingAssemblyInstructions = new ArrayList<>();
 		existingAssemblyInstructions.add(new LoadImmediate(null, null));
