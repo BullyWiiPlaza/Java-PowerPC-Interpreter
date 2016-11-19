@@ -18,9 +18,14 @@ public class AssemblyInterpreter
 
 	public AssemblyInterpreter()
 	{
+		this(RandomAccessMemory.SIZE);
+	}
+
+	public AssemblyInterpreter(int memorySize)
+	{
 		generalPurposeRegisters = new GeneralPurposeRegister[REGISTERS_COUNT];
 		floatingPointRegisters = new FloatingPointRegister[REGISTERS_COUNT];
-		memory = new RandomAccessMemory();
+		memory = new RandomAccessMemory(memorySize);
 
 		for (int registerIndex = 0; registerIndex < generalPurposeRegisters.length; registerIndex++)
 		{
@@ -106,5 +111,10 @@ public class AssemblyInterpreter
 	public void setMemoryValue(int offset, int value)
 	{
 		memory.setInteger(value, offset);
+	}
+
+	public void setMemory(RandomAccessMemory memory)
+	{
+		this.memory = memory;
 	}
 }

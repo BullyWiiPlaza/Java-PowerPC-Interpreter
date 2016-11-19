@@ -3,6 +3,7 @@ package com.bullywiihacks.powerpc.assembly.interpreter.graphical_interface;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.AssemblyInterpreter;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.AssemblyParser;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.AssemblyInstruction;
+import com.bullywiihacks.powerpc.assembly.interpreter.library.sources.RandomAccessMemory;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 
@@ -10,7 +11,11 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 public class AssemblyInterpreterGUI extends JFrame
@@ -28,6 +33,10 @@ public class AssemblyInterpreterGUI extends JFrame
 	private MemoryTable memoryTable;
 	private JButton resetButton;
 	private JButton assemblyDocumentationButton;
+	private JTextField startingAddressField;
+	private JTextField endingAddressField;
+	private JButton resetMemoryButton;
+	private JButton informationButton;
 	private AssemblyParser parser;
 	private boolean canInterpret;
 	private AssemblyInterpreter interpreter;
@@ -109,6 +118,85 @@ public class AssemblyInterpreterGUI extends JFrame
 				exception.printStackTrace();
 			}
 		});
+
+		HexadecimalInputFilter.setHexadecimalInputFilter(startingAddressField);
+		startingAddressField.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent documentEvent)
+			{
+				validateAddressRange();
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent documentEvent)
+			{
+				validateAddressRange();
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent documentEvent)
+			{
+				validateAddressRange();
+			}
+		});
+
+		validateAddressRange();
+
+		HexadecimalInputFilter.setHexadecimalInputFilter(endingAddressField);
+		endingAddressField.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent documentEvent)
+			{
+				validateAddressRange();
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent documentEvent)
+			{
+				validateAddressRange();
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent documentEvent)
+			{
+				validateAddressRange();
+			}
+		});
+
+		validateAddressRange();
+
+		resetMemoryButton.addActionListener(actionEvent ->
+		{
+			memoryTable.removeAllRows();
+			int startingOffset = Integer.parseInt(startingAddressField.getText(), 16);
+			int endingOffset = Integer.parseInt(endingAddressField.getText(), 16);
+			int length = endingOffset - startingOffset;
+			RandomAccessMemory randomAccessMemory = new RandomAccessMemory(length);
+			interpreter.setMemory(randomAccessMemory);
+			memoryTable.addRows(startingOffset, interpreter.getMemory());
+		});
+
+		informationButton.addActionListener(actionEvent ->
+		{
+			try
+			{
+				Desktop.getDesktop().browse(new URI("https://github.com/BullyWiiPlaza/Java-PowerPC-Interpreter"));
+			} catch (Exception exception)
+			{
+				exception.printStackTrace();
+			}
+		});
+	}
+
+	private void validateAddressRange()
+	{
+		int startingOffset = Integer.parseInt(startingAddressField.getText(), 16);
+		int endingOffset = Integer.parseInt(endingAddressField.getText(), 16);
+		boolean validRange = endingOffset - startingOffset > 0;
+		startingAddressField.setBackground(validRange ? Color.GREEN : Color.RED);
+		endingAddressField.setBackground(validRange ? Color.GREEN : Color.RED);
 	}
 
 	private void interpretAssembly()
@@ -118,6 +206,7 @@ public class AssemblyInterpreterGUI extends JFrame
 
 		String assembly = assemblyArea.getText();
 		List<AssemblyInstruction> assemblyInstructions = parser.parseAssembly(assembly);
+		int startingOffset = Integer.parseInt(startingAddressField.getText(), 16);
 
 		for (AssemblyInstruction assemblyInstruction : assemblyInstructions)
 		{
@@ -126,16 +215,17 @@ public class AssemblyInterpreterGUI extends JFrame
 		}
 
 		registersTable.addRows(interpreter.getGeneralPurposeRegisters());
-		memoryTable.addRows(interpreter.getMemory());
+		memoryTable.addRows(startingOffset, interpreter.getMemory());
 	}
 
 	private void initializeTables()
 	{
+		int startingOffset = Integer.parseInt(startingAddressField.getText(), 16);
 		interpreter = new AssemblyInterpreter();
 		registersTable.removeAllRows();
 		memoryTable.removeAllRows();
 		registersTable.addRows(interpreter.getGeneralPurposeRegisters());
-		memoryTable.addRows(interpreter.getMemory());
+		memoryTable.addRows(startingOffset, interpreter.getMemory());
 	}
 
 	private void parseInputAsynchronously()
@@ -185,7 +275,7 @@ public class AssemblyInterpreterGUI extends JFrame
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setSize(width, height);
 		setLocationRelativeTo(null);
-		setTitle("Java PowerPC Interpreter");
+		setTitle("Java PowerPC Interpreter by BullyWiiPlaza");
 		setIconImage(this);
 	}
 

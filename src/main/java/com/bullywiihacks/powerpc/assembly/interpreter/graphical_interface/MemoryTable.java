@@ -19,11 +19,11 @@ public class MemoryTable extends JTable
 		JTableUtilities.configureTable(this, names);
 	}
 
-	public void addRows(RandomAccessMemory memory)
+	public void addRows(int startingOffset, RandomAccessMemory memory)
 	{
 		String[] values = memory.getValues();
 
-		for (int memoryAddressIndex = 0; memoryAddressIndex < values.length; memoryAddressIndex += 4)
+		for (int memoryAddressIndex = startingOffset; memoryAddressIndex < values.length; memoryAddressIndex += 4)
 		{
 			String value = values[memoryAddressIndex];
 			Object[] row = new Object[]{ValueConversions.to32BitHexadecimal(memoryAddressIndex), value};

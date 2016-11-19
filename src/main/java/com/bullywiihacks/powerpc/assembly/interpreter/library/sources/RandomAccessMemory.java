@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 
 public class RandomAccessMemory
 {
-	private static final int MEMORY_SIZE = 0x1000 * 4;
+	public static int SIZE = 0x1000;
 
 	private ByteBuffer randomAccessMemory;
 
@@ -15,12 +15,17 @@ public class RandomAccessMemory
 	private int maximumShortOffset;
 	private int maximumIntegerOffset;
 
-	public RandomAccessMemory()
+	public RandomAccessMemory(int size)
 	{
-		randomAccessMemory = ByteBuffer.allocate(MEMORY_SIZE);
+		randomAccessMemory = ByteBuffer.allocate(size * 4);
 		maximumByteOffset = randomAccessMemory.capacity() - 1;
 		maximumShortOffset = maximumByteOffset - 1;
 		maximumIntegerOffset = maximumShortOffset - 2;
+	}
+
+	public RandomAccessMemory()
+	{
+		this(SIZE);
 	}
 
 	public String[] getValues()
