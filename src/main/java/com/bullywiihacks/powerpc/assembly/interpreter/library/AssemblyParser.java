@@ -21,6 +21,7 @@ public class AssemblyParser
 		existingAssemblyInstructions.add(new AddRegisters(null, null, null));
 		existingAssemblyInstructions.add(new SubtractRegisters(null, null, null));
 		existingAssemblyInstructions.add(new AddImmediate(null, null, null));
+		existingAssemblyInstructions.add(new StoreWord(null, null, null));
 		existingAssemblyInstructions.add(new NoOperation());
 	}
 

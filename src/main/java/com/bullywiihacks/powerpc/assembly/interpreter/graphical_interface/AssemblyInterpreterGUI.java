@@ -26,7 +26,7 @@ public class AssemblyInterpreterGUI extends JFrame
 	private JLabel statusLabel;
 	private JScrollPane assemblyAreaScrollPane;
 	private RegistersTable registersTable;
-	private JButton runAssemblyButton;
+	private JButton interpretAssemblyButton;
 	private MemoryTable memoryTable;
 	private JButton resetGeneralPurposeRegistersButton;
 	private JButton assemblyDocumentationButton;
@@ -60,7 +60,14 @@ public class AssemblyInterpreterGUI extends JFrame
 
 	private void addResetButtonListener()
 	{
-		resetGeneralPurposeRegistersButton.addActionListener(actionEvent -> initializeTables());
+		resetGeneralPurposeRegistersButton.addActionListener(actionEvent -> resetGeneralPurposeRegisters());
+	}
+
+	private void resetGeneralPurposeRegisters()
+	{
+		registersTable.removeAllRows();
+		interpreter.setGeneralPurposeRegisters();
+		registersTable.addRows(interpreter.getGeneralPurposeRegisters());
 	}
 
 	private void configureAssemblyArea()
@@ -93,7 +100,7 @@ public class AssemblyInterpreterGUI extends JFrame
 
 	private void addRunAssemblyButtonListener()
 	{
-		runAssemblyButton.addActionListener(actionEvent -> interpretAssembly());
+		interpretAssemblyButton.addActionListener(actionEvent -> handleAssemblyInterpretation());
 	}
 
 	private void addAssemblyAreaScrollPane()
@@ -192,7 +199,7 @@ public class AssemblyInterpreterGUI extends JFrame
 				if (rowIndex != -1)
 				{
 					int value = Integer.parseInt((String) memoryTable.getValueAt(rowIndex, columnIndex), 16);
-					interpreter.setMemoryValue(rowIndex, value);
+					interpreter.setMemoryValue(rowIndex * 4, value);
 				}
 			}
 		});
@@ -225,35 +232,106 @@ public class AssemblyInterpreterGUI extends JFrame
 		endingAddressField.setBackground(validRange ? Color.GREEN : Color.RED);
 	}
 
-	private void interpretAssembly()
+	private void handleAssemblyInterpretation()
 	{
-		// Remove old data
-		int selectedRegistersRow = registersTable.getSelectedRow();
-		registersTable.removeAllRows();
-		int selectedMemoryTableRow = memoryTable.getSelectedRow();
-		memoryTable.removeAllRows();
+		String interpretAssemblyButtonText = interpretAssemblyButton.getText();
+		interpretAssemblyButton.setText("Interpreting...");
+		canInterpret = false;
+		registersTable.setEnabled(false);
+		memoryTable.setEnabled(false);
+		interpretAssemblyButton.setEnabled(false);
 
-		// Interpret the inputted assembly
+		new SwingWorker<String, String>()
+		{
+			@Override
+			protected String doInBackground() throws Exception
+			{
+				interpretInputtedAssembly();
+
+				return null;
+			}
+
+			@Override
+			protected void done()
+			{
+				// Remove old data
+				int selectedRegistersRow = registersTable.getSelectedRow();
+				registersTable.removeAllRows();
+				int selectedMemoryTableRow = memoryTable.getSelectedRow();
+				memoryTable.removeAllRows();
+
+				// Restore selected row
+				int startingOffset = Integer.parseInt(startingAddressField.getText(), 16);
+
+				registersTable.addRows(interpreter.getGeneralPurposeRegisters());
+				if (selectedRegistersRow != -1)
+				{
+					registersTable.setRowSelectionInterval(selectedRegistersRow, selectedRegistersRow);
+				}
+				memoryTable.addRows(startingOffset, interpreter.getMemory());
+				if (selectedMemoryTableRow != -1)
+				{
+					memoryTable.setRowSelectionInterval(selectedMemoryTableRow, selectedMemoryTableRow);
+				}
+
+				interpretAssemblyButton.setText(interpretAssemblyButtonText);
+
+				canInterpret = true;
+				registersTable.setEnabled(true);
+				memoryTable.setEnabled(true);
+				interpretAssemblyButton.setEnabled(true);
+			}
+		}.execute();
+	}
+
+	private void interpretInputtedAssembly()
+	{
 		String assembly = assemblyArea.getText();
 		List<AssemblyInstruction> assemblyInstructions = parser.parse(assembly);
-		int startingOffset = Integer.parseInt(startingAddressField.getText(), 16);
 
-		for (AssemblyInstruction assemblyInstruction : assemblyInstructions)
+		String status = "OK!";
+		int assemblyInstructionIndex = 0;
+
+		try
 		{
-			assemblyInstruction.execute(interpreter);
+			for (AssemblyInstruction assemblyInstruction : assemblyInstructions)
+			{
+				assemblyInstruction.execute(interpreter);
+				assemblyInstructionIndex++;
+			}
+		} catch (Exception exception)
+		{
+			int exceptionLine = assemblyInstructionIndex + 1;
+			setCursorPosition(exceptionLine);
+			status = getStatusFromException(exception);
+			status = "Line " + exceptionLine + " " + status;
 		}
 
-		// Restore selected row
-		registersTable.addRows(interpreter.getGeneralPurposeRegisters());
-		if (selectedRegistersRow != -1)
+		setStatusLabel(status);
+	}
+
+	private void setCursorPosition(int exceptionLine)
+	{
+		String assembly = assemblyArea.getText();
+		int linesCount = 0;
+		int caretPosition = 0;
+
+		for (; caretPosition < assembly.length(); caretPosition++)
 		{
-			registersTable.setRowSelectionInterval(selectedRegistersRow, selectedRegistersRow);
+			char character = assembly.charAt(caretPosition);
+
+			if (character == '\n')
+			{
+				linesCount++;
+
+				if (linesCount == exceptionLine)
+				{
+					break;
+				}
+			}
 		}
-		memoryTable.addRows(startingOffset, interpreter.getMemory());
-		if (selectedMemoryTableRow != -1)
-		{
-			memoryTable.setRowSelectionInterval(selectedMemoryTableRow, selectedMemoryTableRow);
-		}
+
+		assemblyArea.setCaretPosition(caretPosition);
 	}
 
 	private void initializeTables()
@@ -284,7 +362,7 @@ public class AssemblyInterpreterGUI extends JFrame
 				canInterpret = false;
 			}
 
-			runAssemblyButton.setEnabled(canInterpret);
+			interpretAssemblyButton.setEnabled(canInterpret);
 			setStatusLabel(status);
 		});
 

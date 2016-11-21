@@ -1,22 +1,14 @@
 package com.bullywiihacks.powerpc.assembly.interpreter.graphical_interface;
 
-import com.bullywiihacks.powerpc.assembly.interpreter.graphical_interface.utilities.JTableUtilities;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.sources.registers.GeneralPurposeRegister;
 
-import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
-public class RegistersTable extends JTable
+public class RegistersTable extends DataTable
 {
 	public RegistersTable()
 	{
-		String[] columnHeaderNames = new String[]{"Register", "Value"};
-		setColumnHeaderNames(columnHeaderNames);
-	}
-
-	private void setColumnHeaderNames(String[] names)
-	{
-		JTableUtilities.configureTable(this, names);
+		super(new String[]{"Register", "Value"});
 	}
 
 	public void addRows(GeneralPurposeRegister[] registers)
@@ -28,10 +20,5 @@ public class RegistersTable extends JTable
 			DefaultTableModel tableModel = (DefaultTableModel) getModel();
 			tableModel.addRow(row);
 		}
-	}
-
-	public void removeAllRows()
-	{
-		JTableUtilities.deleteAllRows(this);
 	}
 }

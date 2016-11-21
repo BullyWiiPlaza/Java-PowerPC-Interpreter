@@ -117,4 +117,14 @@ public class AssemblyInterpreter
 	{
 		this.memory = memory;
 	}
+
+	public void setGeneralPurposeRegisters()
+	{
+		generalPurposeRegisters = new GeneralPurposeRegister[REGISTERS_COUNT];
+
+		for (int registerIndex = 0; registerIndex < generalPurposeRegisters.length; registerIndex++)
+		{
+			generalPurposeRegisters[registerIndex] = new GeneralPurposeRegister();
+		}
+	}
 }

@@ -17,7 +17,7 @@ public class RandomAccessMemory
 
 	public RandomAccessMemory(int size)
 	{
-		randomAccessMemory = ByteBuffer.allocate(size * 4);
+		randomAccessMemory = ByteBuffer.allocate(size);
 		maximumByteOffset = randomAccessMemory.capacity() - 1;
 		maximumShortOffset = maximumByteOffset - 1;
 		maximumIntegerOffset = maximumShortOffset - 2;
@@ -34,7 +34,7 @@ public class RandomAccessMemory
 		String[] values = new String[randomAccessMemory.limit() / 4];
 
 		int memoryAddressIndex = 0;
-		while (randomAccessMemory.position() < randomAccessMemory.limit() - 4)
+		while (randomAccessMemory.position() < randomAccessMemory.limit() - 3)
 		{
 			values[memoryAddressIndex] = ValueConversions.to32BitHexadecimal(randomAccessMemory.getInt());
 			memoryAddressIndex++;
@@ -97,9 +97,7 @@ public class RandomAccessMemory
 	{
 		if (!isValidOffset(offset, maximumOffset))
 		{
-			throw new IllegalArgumentException("The offset was " + offset
-					+ " but has to be between " + minimumOffset + " and "
-					+ maximumOffset + "!");
+			throw new MemoryOutOfBoundsException(offset, minimumOffset, maximumOffset);
 		}
 	}
 }
