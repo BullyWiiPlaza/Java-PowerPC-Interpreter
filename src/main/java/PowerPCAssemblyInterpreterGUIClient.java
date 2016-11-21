@@ -24,7 +24,7 @@ public class PowerPCAssemblyInterpreterGUIClient
 	{
 		AssemblyInterpreter assemblyInterpreter = new AssemblyInterpreter();
 		AssemblyParser parser = new AssemblyParser();
-		List<AssemblyInstruction> assemblyInstructions = parser.parseAssembly(new File("assembly.txt"));
+		List<AssemblyInstruction> assemblyInstructions = parser.parse(new File("assembly.txt"));
 		for (AssemblyInstruction assemblyInstruction : assemblyInstructions)
 		{
 			System.out.println(assemblyInstruction);

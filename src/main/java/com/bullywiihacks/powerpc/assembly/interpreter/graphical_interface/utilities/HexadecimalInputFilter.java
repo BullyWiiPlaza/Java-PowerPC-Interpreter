@@ -1,4 +1,4 @@
-package com.bullywiihacks.powerpc.assembly.interpreter.graphical_interface;
+package com.bullywiihacks.powerpc.assembly.interpreter.graphical_interface.utilities;
 
 import javax.swing.text.*;
 import java.awt.*;

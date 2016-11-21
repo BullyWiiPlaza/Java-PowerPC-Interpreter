@@ -14,5 +14,15 @@ public abstract class AssemblyInstruction
 
 	public abstract String getMnemonic();
 
-	public abstract AssemblyInstruction parse(String line);
+	public String getMnemonicSpaced()
+	{
+		return getMnemonic() + (hasArguments() ? " " : "");
+	}
+
+	public abstract AssemblyInstruction parse(String instruction);
+
+	protected boolean hasArguments()
+	{
+		return true;
+	}
 }

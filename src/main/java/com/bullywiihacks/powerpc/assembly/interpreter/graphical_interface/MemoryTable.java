@@ -1,5 +1,6 @@
 package com.bullywiihacks.powerpc.assembly.interpreter.graphical_interface;
 
+import com.bullywiihacks.powerpc.assembly.interpreter.graphical_interface.utilities.JTableUtilities;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.sources.RandomAccessMemory;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.utilities.ValueConversions;
 

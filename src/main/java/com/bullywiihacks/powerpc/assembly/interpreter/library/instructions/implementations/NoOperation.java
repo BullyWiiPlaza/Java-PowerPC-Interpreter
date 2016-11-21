@@ -8,13 +8,13 @@ public class NoOperation extends AssemblyInstruction
 	@Override
 	public void execute(AssemblyInterpreter interpreter)
 	{
-
+		// Nothing
 	}
 
 	@Override
 	public String toString()
 	{
-		return getMnemonic();
+		return getMnemonicSpaced();
 	}
 
 	@Override
@@ -24,9 +24,15 @@ public class NoOperation extends AssemblyInstruction
 	}
 
 	@Override
-	public AssemblyInstruction parse(String line)
+	protected boolean hasArguments()
 	{
-		if (line.equals(getMnemonic()))
+		return false;
+	}
+
+	@Override
+	public AssemblyInstruction parse(String instruction)
+	{
+		if (instruction.equals(getMnemonic()))
 		{
 			return new NoOperation();
 		}
@@ -34,6 +40,6 @@ public class NoOperation extends AssemblyInstruction
 		throw new IllegalArgumentException("Unexpected junk after "
 				+ getMnemonic()
 				+ ": "
-				+ line.substring(getMnemonic().length(), line.length()));
+				+ instruction.substring(getMnemonic().length(), instruction.length()));
 	}
 }

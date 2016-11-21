@@ -1,11 +1,11 @@
 package com.bullywiihacks.powerpc.assembly.interpreter.library;
 
-import com.bullywiihacks.powerpc.assembly.interpreter.library.sources.GeneralPurposeRegister;
-import com.bullywiihacks.powerpc.assembly.interpreter.library.sources.FloatingPointRegister;
+import com.bullywiihacks.powerpc.assembly.interpreter.library.sources.registers.GeneralPurposeRegister;
+import com.bullywiihacks.powerpc.assembly.interpreter.library.sources.registers.FloatingPointRegister;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.sources.RandomAccessMemory;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.arguments.ArgumentRegister;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.arguments.Immediate;
-import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.implementations.Add;
+import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.implementations.AddRegisters;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.implementations.LoadImmediate;
 
 public class AssemblyInterpreter
@@ -94,11 +94,11 @@ public class AssemblyInterpreter
 				new ArgumentRegister(31), new Immediate(32767));
 
 		loadImmediate.execute(assemblyInterpreter);
-		Add add = new Add(new ArgumentRegister(30),
+		AddRegisters addRegisters = new AddRegisters(new ArgumentRegister(30),
 				new ArgumentRegister(30), new ArgumentRegister(31));
 
-		add.execute(assemblyInterpreter);
-		add.execute(assemblyInterpreter);
+		addRegisters.execute(assemblyInterpreter);
+		addRegisters.execute(assemblyInterpreter);
 
 		assemblyInterpreter.printAllDataRegisters();
 	}

@@ -18,25 +18,24 @@ public class AssemblyParser
 		existingAssemblyInstructions = new ArrayList<>();
 		existingAssemblyInstructions.add(new LoadImmediate(null, null));
 		existingAssemblyInstructions.add(new LoadImmediateShifted(null, null));
-		existingAssemblyInstructions.add(new Add(null, null, null));
-		existingAssemblyInstructions.add(new Subtract(null, null, null));
+		existingAssemblyInstructions.add(new AddRegisters(null, null, null));
+		existingAssemblyInstructions.add(new SubtractRegisters(null, null, null));
+		existingAssemblyInstructions.add(new AddImmediate(null, null, null));
 		existingAssemblyInstructions.add(new NoOperation());
 	}
 
-	public List<AssemblyInstruction> parseAssembly(File assemblyFile)
+	public List<AssemblyInstruction> parse(File assemblyFile)
 			throws IOException
 	{
 		String assemblyCode = new String(Files.readAllBytes(assemblyFile.toPath()));
 
-		return parseAssembly(assemblyCode);
+		return parse(assemblyCode);
 	}
 
-	public List<AssemblyInstruction> parseAssembly(String assemblyCode)
+	public List<AssemblyInstruction> parse(String assemblyCode)
 	{
 		String[] assemblyLines = assemblyCode.split("\n");
-
 		int assemblyLinesCount = assemblyLines.length;
-
 		List<AssemblyInstruction> assemblyInstructions = new ArrayList<>();
 
 		for (int assemblyInstructionsIndex = 0; assemblyInstructionsIndex < assemblyLinesCount; assemblyInstructionsIndex++)
@@ -68,12 +67,19 @@ public class AssemblyParser
 		existingAssemblyInstructions.stream().filter(assemblyInstruction -> startsWith(currentAssemblyLine, assemblyInstruction)).forEach(assemblyInstruction ->
 		{
 			assemblyInstruction = assemblyInstruction.parse(currentAssemblyLine);
+
+			if (assemblyInstruction == null)
+			{
+				throw new IllegalArgumentException("Instruction parser not implemented!");
+			}
+
 			assemblyInstructions.add(assemblyInstruction);
 		});
 	}
 
 	private boolean startsWith(String line, AssemblyInstruction assemblyInstruction)
 	{
-		return line.startsWith(assemblyInstruction.getMnemonic());
+		String mnemonic = assemblyInstruction.getMnemonicSpaced();
+		return line.startsWith(mnemonic);
 	}
 }

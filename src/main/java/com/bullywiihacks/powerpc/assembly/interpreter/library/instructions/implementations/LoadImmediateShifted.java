@@ -1,6 +1,6 @@
 package com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.implementations;
 
-import com.bullywiihacks.powerpc.assembly.interpreter.library.sources.GeneralPurposeRegister;
+import com.bullywiihacks.powerpc.assembly.interpreter.library.sources.registers.GeneralPurposeRegister;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.ParsingUtilities;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.arguments.ArgumentRegister;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.arguments.Immediate;
@@ -15,8 +15,7 @@ public class LoadImmediateShifted extends LoadImmediate
 	@Override
 	public void modifyDataRegisters(GeneralPurposeRegister[] generalPurposeRegisters)
 	{
-		int registerIndex = register.getRegisterIndex();
-		GeneralPurposeRegister targetRegister = generalPurposeRegisters[registerIndex];
+		GeneralPurposeRegister targetRegister = register.toGeneralPurposeRegister(generalPurposeRegisters);
 
 		int newValue = immediate.getValue();
 		targetRegister.setValue(newValue << 16);
@@ -28,9 +27,9 @@ public class LoadImmediateShifted extends LoadImmediate
 		return "lis";
 	}
 
-	public LoadImmediateShifted parse(String loadImmediateInstruction)
+	public LoadImmediateShifted parse(String instruction)
 	{
-		ParsingUtilities parsingUtils = new ParsingUtilities(loadImmediateInstruction);
+		ParsingUtilities parsingUtils = new ParsingUtilities(instruction);
 		parsingUtils.splitBlanks();
 		parsingUtils.removeCommas();
 

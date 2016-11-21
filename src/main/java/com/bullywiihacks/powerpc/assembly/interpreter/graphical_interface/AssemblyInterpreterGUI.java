@@ -1,5 +1,6 @@
 package com.bullywiihacks.powerpc.assembly.interpreter.graphical_interface;
 
+import com.bullywiihacks.powerpc.assembly.interpreter.graphical_interface.utilities.HexadecimalInputFilter;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.AssemblyInterpreter;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.AssemblyParser;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.AssemblyInstruction;
@@ -10,18 +11,15 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 
 public class AssemblyInterpreterGUI extends JFrame
 {
-	private static int width = 1000;
-	private static int height = 600;
+	private static final int FRAME_WIDTH = 1000;
+	private static final int FRAME_HEIGHT = 600;
 
 	private RSyntaxTextArea assemblyArea;
 	private JPanel rootPanel;
@@ -29,9 +27,8 @@ public class AssemblyInterpreterGUI extends JFrame
 	private JScrollPane assemblyAreaScrollPane;
 	private RegistersTable registersTable;
 	private JButton runAssemblyButton;
-	private JScrollPane registersTableScrollPane;
 	private MemoryTable memoryTable;
-	private JButton resetButton;
+	private JButton resetGeneralPurposeRegistersButton;
 	private JButton assemblyDocumentationButton;
 	private JTextField startingAddressField;
 	private JTextField endingAddressField;
@@ -46,6 +43,28 @@ public class AssemblyInterpreterGUI extends JFrame
 		add(rootPanel);
 		setFrameProperties();
 
+		initializeTables();
+		configureAssemblyArea();
+		addResetButtonListener();
+		parseInputAsynchronously();
+		addRunAssemblyButtonListener();
+		addRegistersTableListener();
+		addMemoryTableListener();
+		addAssemblyDocumentationButtonListener();
+		configureStartingAddressField();
+		configureEndingAddressField();
+		validateAddressRange();
+		addResetMemoryButtonListener();
+		addInformationButtonListener();
+	}
+
+	private void addResetButtonListener()
+	{
+		resetGeneralPurposeRegistersButton.addActionListener(actionEvent -> initializeTables());
+	}
+
+	private void configureAssemblyArea()
+	{
 		assemblyArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_ASSEMBLER_X86);
 		assemblyArea.setCodeFoldingEnabled(true);
 		assemblyArea.getDocument().addDocumentListener(new DocumentListener()
@@ -69,80 +88,61 @@ public class AssemblyInterpreterGUI extends JFrame
 			}
 		});
 
-		resetButton.addActionListener(actionEvent -> initializeTables());
+		addAssemblyAreaScrollPane();
+	}
 
-		parseInputAsynchronously();
-		initializeTables();
+	private void addRunAssemblyButtonListener()
+	{
+		runAssemblyButton.addActionListener(actionEvent -> interpretAssembly());
+	}
 
+	private void addAssemblyAreaScrollPane()
+	{
 		TextLineNumber textLineNumber = new TextLineNumber(assemblyArea);
 		assemblyAreaScrollPane.setRowHeaderView(textLineNumber);
-		assemblyAreaScrollPane.setPreferredSize(new Dimension(width / 2, height));
+		assemblyAreaScrollPane.setPreferredSize(new Dimension(FRAME_WIDTH / 2, FRAME_HEIGHT));
+	}
 
-		runAssemblyButton.addActionListener(actionEvent -> interpretAssembly());
-
-		registersTable.addPropertyChangeListener(changeListener ->
-		{
-			if ("tableCellEditor".equals(changeListener.getPropertyName()))
-			{
-				if (!registersTable.isEditing())
-				{
-					int index = registersTable.getSelectedRow();
-					int column = registersTable.getSelectedColumn();
-					int value = Integer.parseInt((String) registersTable.getValueAt(index, column), 16);
-					interpreter.setGeneralPurposeRegisterValue(index, value);
-				}
-			}
-		});
-
-		memoryTable.addPropertyChangeListener(changeListener ->
-		{
-			if ("tableCellEditor".equals(changeListener.getPropertyName()))
-			{
-				if (!memoryTable.isEditing())
-				{
-					int index = memoryTable.getSelectedRow();
-					int column = memoryTable.getSelectedColumn();
-					int value = Integer.parseInt((String) memoryTable.getValueAt(index, column), 16);
-					interpreter.setMemoryValue(index, value);
-				}
-			}
-		});
-
-		assemblyDocumentationButton.addActionListener(actionEvent ->
+	private void addInformationButtonListener()
+	{
+		informationButton.addActionListener(actionEvent ->
 		{
 			try
 			{
-				Desktop.getDesktop().browse(new URI("http://www.ds.ewi.tudelft.nl/vakken/in1006/instruction-set/"));
+				Desktop.getDesktop().browse(new URI("https://github.com/BullyWiiPlaza/Java-PowerPC-Interpreter"));
 			} catch (Exception exception)
 			{
 				exception.printStackTrace();
 			}
 		});
+	}
 
-		HexadecimalInputFilter.setHexadecimalInputFilter(startingAddressField);
-		startingAddressField.getDocument().addDocumentListener(new DocumentListener()
+	private void addResetMemoryButtonListener()
+	{
+		resetMemoryButton.addActionListener(actionEvent ->
 		{
-			@Override
-			public void insertUpdate(DocumentEvent documentEvent)
-			{
-				validateAddressRange();
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent documentEvent)
-			{
-				validateAddressRange();
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent documentEvent)
-			{
-				validateAddressRange();
-			}
+			memoryTable.removeAllRows();
+			int startingOffset = Integer.parseInt(startingAddressField.getText(), 16);
+			int endingOffset = Integer.parseInt(endingAddressField.getText(), 16);
+			int length = endingOffset - startingOffset;
+			RandomAccessMemory randomAccessMemory = new RandomAccessMemory(length);
+			interpreter.setMemory(randomAccessMemory);
+			memoryTable.addRows(startingOffset, interpreter.getMemory());
 		});
+	}
 
-		validateAddressRange();
+	private void configureEndingAddressField()
+	{
+		configureAddressRangeField(endingAddressField);
+	}
 
+	private void configureStartingAddressField()
+	{
+		configureAddressRangeField(startingAddressField);
+	}
+
+	private void configureAddressRangeField(JTextComponent endingAddressField)
+	{
 		HexadecimalInputFilter.setHexadecimalInputFilter(endingAddressField);
 		endingAddressField.getDocument().addDocumentListener(new DocumentListener()
 		{
@@ -164,28 +164,54 @@ public class AssemblyInterpreterGUI extends JFrame
 				validateAddressRange();
 			}
 		});
+	}
 
-		validateAddressRange();
-
-		resetMemoryButton.addActionListener(actionEvent ->
-		{
-			memoryTable.removeAllRows();
-			int startingOffset = Integer.parseInt(startingAddressField.getText(), 16);
-			int endingOffset = Integer.parseInt(endingAddressField.getText(), 16);
-			int length = endingOffset - startingOffset;
-			RandomAccessMemory randomAccessMemory = new RandomAccessMemory(length);
-			interpreter.setMemory(randomAccessMemory);
-			memoryTable.addRows(startingOffset, interpreter.getMemory());
-		});
-
-		informationButton.addActionListener(actionEvent ->
+	private void addAssemblyDocumentationButtonListener()
+	{
+		assemblyDocumentationButton.addActionListener(actionEvent ->
 		{
 			try
 			{
-				Desktop.getDesktop().browse(new URI("https://github.com/BullyWiiPlaza/Java-PowerPC-Interpreter"));
+				Desktop.getDesktop().browse(new URI("http://www.ds.ewi.tudelft.nl/vakken/in1006/instruction-set/"));
 			} catch (Exception exception)
 			{
 				exception.printStackTrace();
+			}
+		});
+	}
+
+	private void addMemoryTableListener()
+	{
+		memoryTable.addPropertyChangeListener(changeListener ->
+		{
+			if (!memoryTable.isEditing())
+			{
+				int rowIndex = memoryTable.getSelectedRow();
+				int columnIndex = memoryTable.getSelectedColumn();
+
+				if (rowIndex != -1)
+				{
+					int value = Integer.parseInt((String) memoryTable.getValueAt(rowIndex, columnIndex), 16);
+					interpreter.setMemoryValue(rowIndex, value);
+				}
+			}
+		});
+	}
+
+	private void addRegistersTableListener()
+	{
+		registersTable.addPropertyChangeListener(changeListener ->
+		{
+			if (!registersTable.isEditing())
+			{
+				int rowIndex = registersTable.getSelectedRow();
+				int columnIndex = registersTable.getSelectedColumn();
+
+				if (rowIndex != -1)
+				{
+					int value = Integer.parseInt((String) registersTable.getValueAt(rowIndex, columnIndex), 16);
+					interpreter.setGeneralPurposeRegisterValue(rowIndex, value);
+				}
 			}
 		});
 	}
@@ -201,21 +227,33 @@ public class AssemblyInterpreterGUI extends JFrame
 
 	private void interpretAssembly()
 	{
+		// Remove old data
+		int selectedRegistersRow = registersTable.getSelectedRow();
 		registersTable.removeAllRows();
+		int selectedMemoryTableRow = memoryTable.getSelectedRow();
 		memoryTable.removeAllRows();
 
+		// Interpret the inputted assembly
 		String assembly = assemblyArea.getText();
-		List<AssemblyInstruction> assemblyInstructions = parser.parseAssembly(assembly);
+		List<AssemblyInstruction> assemblyInstructions = parser.parse(assembly);
 		int startingOffset = Integer.parseInt(startingAddressField.getText(), 16);
 
 		for (AssemblyInstruction assemblyInstruction : assemblyInstructions)
 		{
-			System.out.println(assemblyInstruction);
 			assemblyInstruction.execute(interpreter);
 		}
 
+		// Restore selected row
 		registersTable.addRows(interpreter.getGeneralPurposeRegisters());
+		if (selectedRegistersRow != -1)
+		{
+			registersTable.setRowSelectionInterval(selectedRegistersRow, selectedRegistersRow);
+		}
 		memoryTable.addRows(startingOffset, interpreter.getMemory());
+		if (selectedMemoryTableRow != -1)
+		{
+			memoryTable.setRowSelectionInterval(selectedMemoryTableRow, selectedMemoryTableRow);
+		}
 	}
 
 	private void initializeTables()
@@ -230,15 +268,15 @@ public class AssemblyInterpreterGUI extends JFrame
 
 	private void parseInputAsynchronously()
 	{
-		Thread thread = new Thread(() ->
+		Thread parserThread = new Thread(() ->
 		{
 			String status = "OK!";
 
 			try
 			{
 				parser = new AssemblyParser();
-				String inputtedAssembly = assemblyArea.getText();
-				parser.parseAssembly(inputtedAssembly);
+				String input = assemblyArea.getText();
+				parser.parse(input);
 				canInterpret = true;
 			} catch (Exception exception)
 			{
@@ -250,7 +288,7 @@ public class AssemblyInterpreterGUI extends JFrame
 			setStatusLabel(status);
 		});
 
-		thread.start();
+		parserThread.start();
 	}
 
 	private String getStatusFromException(Exception exception)
@@ -259,7 +297,7 @@ public class AssemblyInterpreterGUI extends JFrame
 		String[] exceptionPathComponents = exceptionClassName.split("\\.");
 		exceptionClassName = exceptionPathComponents[exceptionPathComponents.length - 1];
 		String status = exceptionClassName + " " + exception.getMessage();
-		int statusSizeLimit = width / 10;
+		int statusSizeLimit = FRAME_WIDTH / 10;
 
 		if (status.length() > statusSizeLimit)
 		{
@@ -273,15 +311,10 @@ public class AssemblyInterpreterGUI extends JFrame
 	private void setFrameProperties()
 	{
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		setSize(width, height);
+		setSize(FRAME_WIDTH, FRAME_HEIGHT);
 		setLocationRelativeTo(null);
 		setTitle("Java PowerPC Interpreter by BullyWiiPlaza");
-		setIconImage(this);
-	}
-
-	public static void setIconImage(Window window)
-	{
-		window.setIconImage(Toolkit.getDefaultToolkit().getImage(AssemblyInterpreterGUI.class.getResource("/Icon.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(AssemblyInterpreterGUI.class.getResource("/Icon.png")));
 	}
 
 	private void setStatusLabel(String statusText)

@@ -1,6 +1,7 @@
 package com.bullywiihacks.powerpc.assembly.interpreter.graphical_interface;
 
-import com.bullywiihacks.powerpc.assembly.interpreter.library.sources.GeneralPurposeRegister;
+import com.bullywiihacks.powerpc.assembly.interpreter.graphical_interface.utilities.JTableUtilities;
+import com.bullywiihacks.powerpc.assembly.interpreter.library.sources.registers.GeneralPurposeRegister;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

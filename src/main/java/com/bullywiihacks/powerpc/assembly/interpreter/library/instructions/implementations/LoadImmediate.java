@@ -1,7 +1,7 @@
 package com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.implementations;
 
 import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.arguments.Immediate;
-import com.bullywiihacks.powerpc.assembly.interpreter.library.sources.GeneralPurposeRegister;
+import com.bullywiihacks.powerpc.assembly.interpreter.library.sources.registers.GeneralPurposeRegister;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.DataRegisterEditor;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.ParsingUtilities;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.arguments.ArgumentRegister;
@@ -9,8 +9,8 @@ import com.bullywiihacks.powerpc.assembly.interpreter.library.utilities.ValueCon
 
 public class LoadImmediate extends DataRegisterEditor
 {
-	protected ArgumentRegister register;
-	protected Immediate immediate;
+	ArgumentRegister register;
+	Immediate immediate;
 
 	public LoadImmediate(ArgumentRegister register, Immediate immediate)
 	{
@@ -21,8 +21,7 @@ public class LoadImmediate extends DataRegisterEditor
 	@Override
 	public void modifyDataRegisters(GeneralPurposeRegister[] generalPurposeRegisters)
 	{
-		int registerIndex = register.getRegisterIndex();
-		GeneralPurposeRegister targetRegister = generalPurposeRegisters[registerIndex];
+		GeneralPurposeRegister targetRegister = register.toGeneralPurposeRegister(generalPurposeRegisters);
 
 		int newValue = immediate.getValue();
 		targetRegister.setValue(newValue);
@@ -31,7 +30,7 @@ public class LoadImmediate extends DataRegisterEditor
 	@Override
 	public String toString()
 	{
-		return getMnemonic() + " " + register + ", "
+		return getMnemonicSpaced() + register + ", "
 				+ ValueConversions.toHexadecimalNotation(immediate.getValue());
 	}
 
@@ -41,9 +40,9 @@ public class LoadImmediate extends DataRegisterEditor
 		return "li";
 	}
 
-	public LoadImmediate parse(String loadImmediateInstruction)
+	public LoadImmediate parse(String instruction)
 	{
-		ParsingUtilities parsingUtils = new ParsingUtilities(loadImmediateInstruction);
+		ParsingUtilities parsingUtils = new ParsingUtilities(instruction);
 		parsingUtils.splitBlanks();
 		parsingUtils.removeCommas();
 

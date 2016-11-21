@@ -1,6 +1,7 @@
 package com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.arguments;
 
 import com.bullywiihacks.powerpc.assembly.interpreter.library.AssemblyInterpreter;
+import com.bullywiihacks.powerpc.assembly.interpreter.library.sources.registers.GeneralPurposeRegister;
 
 public class ArgumentRegister
 {
@@ -28,11 +29,6 @@ public class ArgumentRegister
 				&& (registerIndex >= registersMinIndex);
 	}
 
-	public int getRegisterIndex()
-	{
-		return registerIndex;
-	}
-
 	public static ArgumentRegister parse(String argumentRegisterText)
 	{
 		if (!argumentRegisterText.startsWith("r"))
@@ -45,6 +41,11 @@ public class ArgumentRegister
 
 			return new ArgumentRegister(registerIndex);
 		}
+	}
+
+	public GeneralPurposeRegister toGeneralPurposeRegister(GeneralPurposeRegister[] generalPurposeRegisters)
+	{
+		return generalPurposeRegisters[registerIndex];
 	}
 
 	@Override

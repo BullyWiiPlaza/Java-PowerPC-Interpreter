@@ -1,12 +1,12 @@
 package com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.implementations;
 
-import com.bullywiihacks.powerpc.assembly.interpreter.library.sources.GeneralPurposeRegister;
+import com.bullywiihacks.powerpc.assembly.interpreter.library.sources.registers.GeneralPurposeRegister;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.ParsingUtilities;
 import com.bullywiihacks.powerpc.assembly.interpreter.library.instructions.arguments.ArgumentRegister;
 
-public class Subtract extends Add
+public class SubtractRegisters extends AddRegisters
 {
-	public Subtract(ArgumentRegister destinationArgumentRegister, ArgumentRegister firstSourceArgumentRegister, ArgumentRegister secondSourceArgumentRegister)
+	public SubtractRegisters(ArgumentRegister destinationArgumentRegister, ArgumentRegister firstSourceArgumentRegister, ArgumentRegister secondSourceArgumentRegister)
 	{
 		super(destinationArgumentRegister, firstSourceArgumentRegister, secondSourceArgumentRegister);
 	}
@@ -20,12 +20,9 @@ public class Subtract extends Add
 	@Override
 	public void modifyDataRegisters(GeneralPurposeRegister[] generalPurposeRegisters)
 	{
-		GeneralPurposeRegister destinationRegister = generalPurposeRegisters[destinationArgumentRegister
-				.getRegisterIndex()];
-		GeneralPurposeRegister firstSourceRegister = generalPurposeRegisters[firstSourceArgumentRegister
-				.getRegisterIndex()];
-		GeneralPurposeRegister secondSourceRegister = generalPurposeRegisters[secondSourceArgumentRegister
-				.getRegisterIndex()];
+		GeneralPurposeRegister destinationRegister = this.destinationRegister.toGeneralPurposeRegister(generalPurposeRegisters);
+		GeneralPurposeRegister firstSourceRegister = this.firstSourceRegister.toGeneralPurposeRegister(generalPurposeRegisters);
+		GeneralPurposeRegister secondSourceRegister = this.secondSourceRegister.toGeneralPurposeRegister(generalPurposeRegisters);
 
 		int firstSourceValue = firstSourceRegister.getValue();
 		int secondSourceValue = secondSourceRegister.getValue();
@@ -33,9 +30,9 @@ public class Subtract extends Add
 		destinationRegister.setValue(firstSourceValue - secondSourceValue);
 	}
 
-	public Subtract parse(String addRegistersInstruction)
+	public SubtractRegisters parse(String instruction)
 	{
-		ParsingUtilities parsingUtilities = new ParsingUtilities(addRegistersInstruction);
+		ParsingUtilities parsingUtilities = new ParsingUtilities(instruction);
 		parsingUtilities.splitBlanks();
 		parsingUtilities.removeCommas();
 
@@ -46,7 +43,7 @@ public class Subtract extends Add
 		ArgumentRegister secondSourceArgumentRegister = ArgumentRegister
 				.parse(parsingUtilities.getNextArgument());
 
-		return new Subtract(destinationArgumentRegister,
+		return new SubtractRegisters(destinationArgumentRegister,
 				firstSourceArgumentRegister, secondSourceArgumentRegister);
 	}
 }

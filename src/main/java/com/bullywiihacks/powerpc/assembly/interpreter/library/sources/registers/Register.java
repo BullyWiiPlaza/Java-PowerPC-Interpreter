@@ -1,4 +1,4 @@
-package com.bullywiihacks.powerpc.assembly.interpreter.library.sources;
+package com.bullywiihacks.powerpc.assembly.interpreter.library.sources.registers;
 
 public abstract class Register<T extends Number>
 {
