@@ -1,2 +1,4 @@
-\target
-\assembly.txt
+/target
+/assembly.txt
+/.idea
+/*.iml

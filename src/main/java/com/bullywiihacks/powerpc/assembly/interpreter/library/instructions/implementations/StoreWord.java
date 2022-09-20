@@ -54,8 +54,8 @@ public class StoreWord extends MemoryEditor
 	}
 
 	@Override
-	public void modifyMemory(GeneralPurposeRegister[] generalPurposeRegisters,
-	                         RandomAccessMemory randomAccessMemory)
+	public void modify(GeneralPurposeRegister[] generalPurposeRegisters,
+	                   RandomAccessMemory randomAccessMemory)
 	{
 		GeneralPurposeRegister targetRegister = targetArgument.toGeneralPurposeRegister(generalPurposeRegisters);
 		int targetRegisterValue = targetRegister.getValue();

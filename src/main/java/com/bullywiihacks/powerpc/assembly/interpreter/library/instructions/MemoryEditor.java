@@ -12,9 +12,9 @@ public abstract class MemoryEditor extends AssemblyInstruction
 		RandomAccessMemory randomAccessMemory = interpreter.getMemory();
 		GeneralPurposeRegister[] generalPurposeRegisters = interpreter.getGeneralPurposeRegisters();
 
-		modifyMemory(generalPurposeRegisters, randomAccessMemory);
+		modify(generalPurposeRegisters, randomAccessMemory);
 	}
 
-	public abstract void modifyMemory(GeneralPurposeRegister[] generalPurposeRegisters,
-	                                  RandomAccessMemory randomAccessMemory);
+	public abstract void modify(GeneralPurposeRegister[] generalPurposeRegisters,
+	                            RandomAccessMemory randomAccessMemory);
 }
